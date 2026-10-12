@@ -1,150 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fatty Family Mail</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fatty Family Mail</title>
 
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#0e0e0e;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.app{max-width:760px;margin:auto;padding:24px 16px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px}
-.brand{font-size:21px;font-weight:750;letter-spacing:-.6px}
-.badge{font-size:11px;background:#292929;padding:8px 12px;border-radius:20px}
-h1{font-size:31px;letter-spacing:-1px;margin:0 0 8px}
-.subtitle{color:#999;font-size:14px;line-height:1.6}
-.toolbar{display:flex;gap:10px;margin:24px 0}
-input{min-width:0;flex:1;padding:14px;border:1px solid #303030;border-radius:13px;background:#191919;color:white;font-size:14px;outline:none}
-button{border:0;border-radius:13px;padding:13px 16px;background:#fff;color:#111;font-weight:650;cursor:pointer}
-.section{font-size:11px;color:#888;letter-spacing:1.2px;text-transform:uppercase;margin:24px 0 12px}
-.email{display:block;width:100%;text-align:left;padding:16px;margin-bottom:10px;border:1px solid #292929;border-radius:15px;background:#171717;color:white}
-.email.unread{border-left:3px solid white}
-.top{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}
-.sender{font-size:14px;font-weight:700;overflow-wrap:anywhere}
-.date{font-size:11px;color:#888;white-space:nowrap}
-.subject{font-size:14px;margin-bottom:7px;overflow-wrap:anywhere}
-.preview{font-size:13px;color:#999;line-height:1.5;overflow-wrap:anywhere}
-.status{padding:25px 8px;color:#999;font-size:13px;line-height:1.6}
-.hidden{display:none!important}
-footer{text-align:center;padding:28px 0;color:#666;font-size:11px}
-</style>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #0e0e0e;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: -0.8px;
+    }
+
+    .level {
+      color: #aaa;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 15px;
+      background: white;
+      color: black;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .status {
+      padding: 13px;
+      background: #191919;
+      border-radius: 12px;
+      color: #bbb;
+      font-size: 13px;
+      margin-bottom: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .email {
+      background: #171717;
+      border: 1px solid #292929;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .email:active {
+      background: #222;
+    }
+
+    .subject {
+      font-weight: 650;
+      font-size: 15px;
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .sender {
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .date {
+      font-size: 11px;
+      color: #777;
+    }
+
+    .body {
+      display: none;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #ddd;
+      border-top: 1px solid #333;
+      margin-top: 14px;
+      padding-top: 14px;
+    }
+
+    .email.open .body {
+      display: block;
+    }
+
+    .unread {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #8ab4f8;
+      border-radius: 50%;
+      margin-right: 7px;
+      vertical-align: middle;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 15px;
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
 </head>
 
 <body>
-<main class="app">
-<header>
-<div class="brand">Fatty Family Mail</div>
-<div class="badge">OWNER</div>
-</header>
+  <div class="header">
+    <div>
+      <h1>Fatty Family Mail</h1>
+      <div class="level" id="levelLabel">Owner Mailbox</div>
+    </div>
 
-<h1>Your inbox.</h1>
-<div class="subtitle">Your mailbox, all in one place.</div>
+    <button id="refreshButton" onclick="loadEmails()">
+      Refresh
+    </button>
+  </div>
 
-<div class="toolbar">
-<input id="search" type="search" placeholder="Search emails..." aria-label="Search emails">
-<button id="refresh">Refresh</button>
-</div>
+  <div class="status" id="status">
+    Connecting to your mailbox...
+  </div>
 
-<div class="section">All emails</div>
-<div id="emails"></div>
-<div id="status" class="status">Connecting to your mailbox...</div>
+  <div id="emails"></div>
 
-<footer>Fatty Family Mail · Owner Dashboard</footer>
-</main>
+  <script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
 
-<script>
-const LEVEL="owner";
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbxZI7i0lDy1p5ph4V5DvWVY79KW-4kR6X3c081iMLIYVHyi7gnCtcP7jqVMelIvs4fpqQ/exec";
 
-/*
-  Replace API_URL with your authenticated email API endpoint.
-  Do not put passwords or private access tokens in this public file.
-*/
-const API_URL="https://script.google.com/macros/s/AKfycbxZI7i0lDy1p5ph4V5DvWVY79KW-4kR6X3c081iMLIYVHyi7gnCtcP7jqVMelIvs4fpqQ/exec";
+    // OWNER REPOSITORY
+    const LEVEL = "owner";
 
-const emailsElement=document.getElementById("emails");
-const statusElement=document.getElementById("status");
+    // ==========================================
 
-document.getElementById("refresh").addEventListener("click",loadEmails);
-document.getElementById("search").addEventListener("input",filterEmails);
+    const statusBox = document.getElementById("status");
+    const emailContainer = document.getElementById("emails");
+    const refreshButton = document.getElementById("refreshButton");
 
-function filterEmails(){
-  const query=document.getElementById("search").value.toLowerCase();
-  document.querySelectorAll(".email").forEach(el=>{
-    el.classList.toggle("hidden",!el.innerText.toLowerCase().includes(query));
-  });
-}
+    document.getElementById("levelLabel").textContent =
+      LEVEL.charAt(0).toUpperCase() + LEVEL.slice(1) + " Mailbox";
 
-function renderEmails(emails){
-  emailsElement.replaceChildren();
+    function setStatus(message) {
+      statusBox.textContent = message;
+    }
 
-  if(!emails.length){
-    statusElement.textContent="No emails found.";
-    return;
-  }
+    function loadEmails() {
+      setStatus("Connecting to Google Apps Script...");
+      emailContainer.innerHTML = "";
+      refreshButton.disabled = true;
 
-  emails.forEach(mail=>{
-    const card=document.createElement("button");
-    card.className="email"+(mail.unread?" unread":"");
+      const url =
+        API_URL +
+        "?action=emails&level=" +
+        encodeURIComponent(LEVEL) +
+        "&_=" +
+        Date.now();
 
-    const top=document.createElement("div");
-    top.className="top";
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+          }
 
-    const sender=document.createElement("div");
-    sender.className="sender";
-    sender.textContent=mail.sender||"Unknown sender";
+          return response.json();
+        })
+        .then(data => {
+          if (!data.success) {
+            throw new Error(
+              data.error || "The server rejected the request."
+            );
+          }
 
-    const date=document.createElement("div");
-    date.className="date";
-    date.textContent=mail.date?new Date(mail.date).toLocaleDateString():"";
+          if (!Array.isArray(data.emails)) {
+            throw new Error("The server returned an unexpected response.");
+          }
 
-    const subject=document.createElement("div");
-    subject.className="subject";
-    subject.textContent=mail.subject||"(No subject)";
+          renderEmails(data.emails);
 
-    const preview=document.createElement("div");
-    preview.className="preview";
-    preview.textContent=mail.body||"";
+          setStatus(
+            data.emails.length +
+            (data.emails.length === 1 ? " email loaded." : " emails loaded.")
+          );
+        })
+        .catch(error => {
+          console.error("Mailbox error:", error);
 
-    top.append(sender,date);
-    card.append(top,subject,preview);
-    emailsElement.append(card);
-  });
+          setStatus(
+            "Couldn't load emails. " +
+            "Check the API connection, server permissions, and authorization settings."
+          );
+        })
+        .finally(() => {
+          refreshButton.disabled = false;
+        });
+    }
 
-  statusElement.textContent=emails.length+" emails loaded.";
-  filterEmails();
-}
+    function renderEmails(emails) {
+      emailContainer.innerHTML = "";
 
-async function loadEmails(){
-  statusElement.textContent="Connecting...";
-  document.getElementById("refresh").disabled=true;
+      if (emails.length === 0) {
+        emailContainer.innerHTML =
+          '<div class="empty">No emails were returned.</div>';
+        return;
+      }
 
-  try{
-    /*
-      The current Apps Script code does not expose a JSON email API.
-      This request will work only after that endpoint is configured.
-    */
-    const response=await fetch(
-      API_URL+"?action=emails&level="+encodeURIComponent(LEVEL),
-      {method:"GET",credentials:"omit"}
-    );
+      emails.forEach(email => {
+        const card = document.createElement("div");
+        card.className = "email";
 
-    if(!response.ok)throw new Error("Server returned "+response.status);
+        const subject = document.createElement("div");
+        subject.className = "subject";
 
-    const data=await response.json();
+        if (email.unread) {
+          const dot = document.createElement("span");
+          dot.className = "unread";
+          subject.appendChild(dot);
+        }
 
-    if(!data.success)throw new Error(data.error||"Access denied.");
+        subject.appendChild(
+          document.createTextNode(email.subject || "(No subject)")
+        );
 
-    renderEmails(data.emails||[]);
-  }catch(error){
-    statusElement.textContent=
-      "Mailbox connection isn't configured yet. The Apps Script backend must provide an authenticated email API.";
-  }finally{
-    document.getElementById("refresh").disabled=false;
-  }
-}
+        const sender = document.createElement("div");
+        sender.className = "sender";
+        sender.textContent = email.sender || "Unknown sender";
 
-loadEmails();
-</script>
+        const date = document.createElement("div");
+        date.className = "date";
+
+        const parsedDate = new Date(email.date);
+
+        date.textContent = isNaN(parsedDate.getTime())
+          ? ""
+          : parsedDate.toLocaleString();
+
+        const body = document.createElement("div");
+        body.className = "body";
+        body.textContent = email.body || "(No message text available)";
+
+        card.append(subject, sender, date, body);
+
+        card.addEventListener("click", () => {
+          card.classList.toggle("open");
+        });
+
+        emailContainer.appendChild(card);
+      });
+    }
+
+    loadEmails();
+  </script>
 </body>
 </html>
