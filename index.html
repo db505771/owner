@@ -1,398 +1,560 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fatty Family Mail</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e0e0e">
+  <title>Fatty Family Mail</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  padding: 20px;
-  background: #0e0e0e;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+    body {
+      margin: 0;
+      padding: 20px 16px 40px;
+      background: #0e0e0e;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 24px;
-}
+    .header {
+      max-width: 760px;
+      margin: 0 auto 22px;
+    }
 
-h1 {
-  margin: 0;
-  font-size: 25px;
-  letter-spacing: -.8px;
-}
+    h1 {
+      margin: 0 0 6px;
+      font-size: 27px;
+      font-weight: 700;
+      letter-spacing: -0.7px;
+    }
 
-.subtitle {
-  margin-top: 7px;
-  font-size: 12px;
-  color: #999;
-}
+    .subtitle {
+      margin-bottom: 18px;
+      color: #999999;
+      font-size: 14px;
+    }
 
-button {
-  border: none;
-  border-radius: 12px;
-  padding: 12px 16px;
-  background: #fff;
-  color: #000;
-  font-size: 13px;
-  font-weight: 650;
-  cursor: pointer;
-}
+    .toolbar {
+      display: flex;
+      gap: 10px;
+    }
 
-button:disabled {
-  opacity: .45;
-  cursor: wait;
-}
+    button {
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-.status {
-  padding: 13px;
-  margin-bottom: 16px;
-  background: #191919;
-  border-radius: 12px;
-  color: #bbb;
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
+    .refresh {
+      padding: 10px 16px;
+      border: 1px solid #333333;
+      border-radius: 11px;
+      background: #1c1c1e;
+      color: #ffffff;
+      font-size: 14px;
+      cursor: pointer;
+    }
 
-.email {
-  padding: 16px;
-  margin-bottom: 12px;
-  background: #171717;
-  border: 1px solid #292929;
-  border-radius: 15px;
-  cursor: pointer;
-}
+    .refresh:disabled {
+      opacity: 0.5;
+    }
 
-.email:active {
-  background: #222;
-}
+    .status {
+      max-width: 760px;
+      margin: 0 auto 14px;
+      color: #999999;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
 
-.subject {
-  margin-bottom: 8px;
-  font-size: 15px;
-  font-weight: 650;
-  overflow-wrap: anywhere;
-}
+    #emails {
+      max-width: 760px;
+      margin: 0 auto;
+    }
 
-.sender {
-  margin-bottom: 8px;
-  color: #aaa;
-  font-size: 12px;
-  overflow-wrap: anywhere;
-}
+    .email {
+      margin-bottom: 10px;
+      padding: 16px;
+      border: 1px solid #292929;
+      border-radius: 15px;
+      background: #171717;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      overflow: hidden;
+    }
 
-.date {
-  color: #777;
-  font-size: 11px;
-}
+    .email:active {
+      background: #202020;
+    }
 
-.body {
-  display: none;
-  padding-top: 14px;
-  margin-top: 14px;
-  border-top: 1px solid #333;
-  color: #ddd;
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
+    .subject {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 650;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
 
-.email.open .body {
-  display: block;
-}
+    .unread {
+      flex: 0 0 8px;
+      width: 8px;
+      height: 8px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: #6ea8ff;
+    }
 
-.unread {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 7px;
-  border-radius: 50%;
-  background: #8ab4f8;
-}
+    .sender {
+      margin-bottom: 5px;
+      color: #c1c1c1;
+      font-size: 13px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
 
-.empty {
-  padding: 40px 15px;
-  color: #888;
-  text-align: center;
-}
+    .date {
+      color: #777777;
+      font-size: 12px;
+      line-height: 1.4;
+    }
 
-.load-more {
-  width: 100%;
-  margin: 8px 0 24px;
-}
+    .body {
+      display: none;
+      margin-top: 15px;
+      padding-top: 14px;
+      border-top: 1px solid #303030;
+      color: #dddddd;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      user-select: text;
+      -webkit-user-select: text;
+      cursor: text;
+    }
 
-</style>
+    .email.open .body {
+      display: block;
+    }
+
+    .load-more {
+      display: block;
+      width: 100%;
+      max-width: 760px;
+      margin: 18px auto 0;
+      padding: 15px;
+      border: 1px solid #383838;
+      border-radius: 14px;
+      background: #222222;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .load-more:active {
+      background: #303030;
+    }
+
+    .load-more:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    .empty,
+    .error {
+      padding: 24px 18px;
+      border: 1px solid #292929;
+      border-radius: 15px;
+      background: #171717;
+      color: #aaaaaa;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .error {
+      color: #ff9b9b;
+    }
+
+    @media (min-width: 600px) {
+      body {
+        padding: 30px 24px 50px;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-<div class="header">
-  <div>
+  <header class="header">
     <h1>Fatty Family Mail</h1>
-    <div class="subtitle" id="subtitle">
-      Owner Mailbox · Full access
+    <div class="subtitle" id="subtitle">Owner Mailbox · Full access</div>
+
+    <div class="toolbar">
+      <button class="refresh" id="refreshButton" type="button">
+        Refresh
+      </button>
     </div>
+  </header>
+
+  <div class="status" id="status" role="status" aria-live="polite">
+    Connecting to mailbox...
   </div>
 
-  <button id="refreshButton" onclick="refreshEmails()">
-    Refresh
+  <main id="emails"></main>
+
+  <button
+    class="load-more"
+    id="loadMoreButton"
+    type="button"
+  >
+    Load More Emails
   </button>
-</div>
 
-<div class="status" id="status">
-  Connecting to mailbox...
-</div>
+  <script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
 
-<div id="emails"></div>
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbxZI7i0lDy1p5ph4V5DvWVY79KW-4kR6X3c081iMLIYVHyi7gnCtcP7jqVMelIvs4fpqQ/exec";
 
-<button
-  id="loadMoreButton"
-  class="load-more"
-  onclick="loadMore()"
-  hidden
->
-  Load More
-</button>
+    // OWNER PAGE
+    // Other pages: "level3", "level2", or "level1"
+    const LEVEL = "owner";
 
-<script>
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbxZI7i0lDy1p5ph4V5DvWVY79KW-4kR6X3c081iMLIYVHyi7gnCtcP7jqVMelIvs4fpqQ/exec";
+    // Number of inbox conversations to request per page.
+    const PAGE_SIZE = 30;
 
-// OWNER REPOSITORY
-const LEVEL = "owner";
+    // ==========================================
+    // ELEMENTS AND STATE
+    // ==========================================
 
-const PAGE_SIZE = 30;
+    const statusBox = document.getElementById("status");
+    const emailContainer = document.getElementById("emails");
+    const refreshButton = document.getElementById("refreshButton");
+    const loadMoreButton = document.getElementById("loadMoreButton");
+    const subtitle = document.getElementById("subtitle");
 
-const statusBox = document.getElementById("status");
-const emailContainer = document.getElementById("emails");
-const refreshButton = document.getElementById("refreshButton");
-const loadMoreButton = document.getElementById("loadMoreButton");
+    let offset = 0;
+    let loading = false;
+    let moreAvailable = true;
+    let requestNumber = 0;
 
-let offset = 0;
-let loading = false;
-let requestNumber = 0;
-let moreAvailable = false;
+    subtitle.textContent =
+      LEVEL === "owner"
+        ? "Owner Mailbox · Full access"
+        : LEVEL === "level3"
+        ? "Level 3 Mailbox · Read-only"
+        : LEVEL === "level2"
+        ? "Level 2 Mailbox · Filtered Roblox notices"
+        : "Level 1 Mailbox · Regular emails";
 
-function setStatus(message) {
-  statusBox.textContent = message;
-}
+    // ==========================================
+    // JSONP REQUEST
+    // Allows the GitHub Pages site to call Apps Script.
+    // ==========================================
 
-function jsonp(params) {
-  return new Promise(function(resolve, reject) {
-    const callbackName =
-      "ffm_" + Date.now() + "_" +
-      Math.random().toString(36).slice(2);
+    function jsonp(params) {
+      return new Promise((resolve, reject) => {
+        const callbackName =
+          "ffm_" +
+          Date.now() +
+          "_" +
+          Math.random().toString(36).slice(2);
 
-    const script = document.createElement("script");
+        const script = document.createElement("script");
+        const url = new URL(API_URL);
 
-    const url = new URL(API_URL);
+        Object.keys(params).forEach(key => {
+          url.searchParams.set(key, params[key]);
+        });
 
-    Object.keys(params).forEach(function(key) {
-      url.searchParams.set(key, params[key]);
-    });
+        url.searchParams.set("callback", callbackName);
+        url.searchParams.set("_", Date.now());
 
-    url.searchParams.set("callback", callbackName);
-    url.searchParams.set("_", Date.now());
+        let finished = false;
 
-    let finished = false;
+        const timeout = setTimeout(() => {
+          finish();
+          reject(new Error("The server took too long to respond."));
+        }, 25000);
 
-    const timeout = setTimeout(function() {
-      finish();
-      reject(new Error("The server took too long to respond."));
-    }, 20000);
+        function finish() {
+          if (finished) return;
 
-    function finish() {
-      if (finished) return;
+          finished = true;
+          clearTimeout(timeout);
 
-      finished = true;
-      clearTimeout(timeout);
+          try {
+            delete window[callbackName];
+          } catch (e) {
+            window[callbackName] = undefined;
+          }
 
-      delete window[callbackName];
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+        }
 
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
+        window[callbackName] = function(data) {
+          finish();
+          resolve(data);
+        };
+
+        script.onerror = function() {
+          finish();
+          reject(
+            new Error("Could not connect to Google Apps Script.")
+          );
+        };
+
+        script.src = url.toString();
+        document.head.appendChild(script);
+      });
+    }
+
+    // ==========================================
+    // REFRESH
+    // ==========================================
+
+    refreshButton.addEventListener("click", refreshEmails);
+
+    async function refreshEmails() {
+      if (loading) return;
+
+      offset = 0;
+      moreAvailable = true;
+      requestNumber++;
+
+      emailContainer.replaceChildren();
+
+      loadMoreButton.hidden = false;
+      loadMoreButton.style.display = "block";
+      loadMoreButton.disabled = false;
+      loadMoreButton.textContent = "Load More Emails";
+
+      await loadPage(true);
+    }
+
+    // ==========================================
+    // LOAD MORE
+    // ==========================================
+
+    loadMoreButton.addEventListener("click", loadMore);
+
+    async function loadMore() {
+      if (loading || !moreAvailable) return;
+
+      await loadPage(false);
+    }
+
+    // ==========================================
+    // LOAD EMAIL PAGE
+    // ==========================================
+
+    async function loadPage(isFirstPage) {
+      if (loading) return;
+
+      loading = true;
+
+      const thisRequest = requestNumber;
+
+      refreshButton.disabled = true;
+      loadMoreButton.disabled = true;
+
+      statusBox.textContent = isFirstPage
+        ? "Loading emails..."
+        : "Loading more emails...";
+
+      loadMoreButton.textContent = "Loading...";
+
+      try {
+        const data = await jsonp({
+          action: "emails",
+          level: LEVEL,
+          offset: offset,
+          limit: PAGE_SIZE
+        });
+
+        if (thisRequest !== requestNumber) return;
+
+        if (!data || !data.success) {
+          throw new Error(
+            data && data.error
+              ? data.error
+              : "The mailbox API rejected the request."
+          );
+        }
+
+        const emails = Array.isArray(data.emails)
+          ? data.emails
+          : [];
+
+        if (isFirstPage && emails.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "No emails found in this mailbox.";
+          emailContainer.appendChild(empty);
+        }
+
+        emails.forEach(renderEmail);
+
+        // Pagination is based on inbox conversations (threads).
+        offset += Number(data.limit) || PAGE_SIZE;
+        moreAvailable = Boolean(data.hasMore);
+
+        if (moreAvailable) {
+          loadMoreButton.hidden = false;
+          loadMoreButton.style.display = "block";
+          loadMoreButton.disabled = false;
+          loadMoreButton.textContent = "Load More Emails";
+        } else {
+          loadMoreButton.hidden = false;
+          loadMoreButton.style.display = "block";
+          loadMoreButton.disabled = true;
+          loadMoreButton.textContent = "You've Reached the End";
+        }
+
+        statusBox.textContent =
+          "Loaded " +
+          emailContainer.querySelectorAll(".email").length +
+          " emails.";
+
+      } catch (error) {
+        console.error("Fatty Family Mail error:", error);
+
+        statusBox.textContent = "Unable to load emails.";
+
+        loadMoreButton.hidden = false;
+        loadMoreButton.style.display = "block";
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = isFirstPage
+          ? "Retry Loading Emails"
+          : "Retry Loading More Emails";
+
+        const errorBox = document.createElement("div");
+        errorBox.className = "error";
+        errorBox.textContent = error.message;
+
+        if (isFirstPage) {
+          emailContainer.replaceChildren(errorBox);
+        } else {
+          emailContainer.appendChild(errorBox);
+        }
+
+      } finally {
+        loading = false;
+        refreshButton.disabled = false;
+
+        // Don't overwrite the end-of-mailbox disabled state.
+        if (moreAvailable) {
+          loadMoreButton.disabled = false;
+        }
       }
     }
 
-    window[callbackName] = function(data) {
-      finish();
-      resolve(data);
-    };
+    // ==========================================
+    // DISPLAY AN EMAIL
+    // ==========================================
 
-    script.onerror = function() {
-      finish();
-      reject(new Error("Could not connect to Google Apps Script."));
-    };
+    function renderEmail(email) {
+      const card = document.createElement("article");
+      card.className = "email";
 
-    script.src = url.toString();
-    document.head.appendChild(script);
-  });
-}
+      const subject = document.createElement("div");
+      subject.className = "subject";
 
-async function refreshEmails() {
-  offset = 0;
-  moreAvailable = false;
-  emailContainer.replaceChildren();
-  loadMoreButton.hidden = true;
+      if (email.unread) {
+        const dot = document.createElement("span");
+        dot.className = "unread";
+        dot.setAttribute("aria-label", "Unread");
+        subject.appendChild(dot);
+      }
 
-  await loadPage(true);
-}
-
-async function loadMore() {
-  if (loading || !moreAvailable) return;
-  await loadPage(false);
-}
-
-async function loadPage(isFirstPage) {
-  if (loading) return;
-
-  loading = true;
-  const thisRequest = ++requestNumber;
-
-  refreshButton.disabled = true;
-  loadMoreButton.disabled = true;
-
-  setStatus(isFirstPage ? "Loading emails..." : "Loading older emails...");
-
-  try {
-    const data = await jsonp({
-      action: "emails",
-      level: LEVEL,
-      offset: offset,
-      limit: PAGE_SIZE
-    });
-
-    if (thisRequest !== requestNumber) return;
-
-    if (!data || !data.success) {
-      throw new Error(
-        data && data.error ? data.error : "The API rejected the request."
+      subject.appendChild(
+        document.createTextNode(email.subject || "(No subject)")
       );
-    }
 
-    const emails = Array.isArray(data.emails) ? data.emails : [];
+      const sender = document.createElement("div");
+      sender.className = "sender";
+      sender.textContent = email.sender || "Unknown sender";
 
-    if (isFirstPage && emails.length === 0) {
-      emailContainer.innerHTML =
-        '<div class="empty">No emails found.</div>';
-    }
+      const date = document.createElement("div");
+      date.className = "date";
 
-    emails.forEach(renderEmail);
+      const parsedDate = new Date(email.date);
 
-    offset += data.limit || PAGE_SIZE;
-    moreAvailable = Boolean(data.hasMore);
+      date.textContent = isNaN(parsedDate.getTime())
+        ? ""
+        : parsedDate.toLocaleString();
 
-    loadMoreButton.hidden = !moreAvailable;
+      const body = document.createElement("div");
+      body.className = "body";
+      body.textContent = "Tap to load message...";
 
-    setStatus(
-      "Loaded " + emailContainer.children.length + " emails."
-    );
+      card.append(subject, sender, date, body);
 
-  } catch (error) {
-    console.error(error);
-    setStatus("Unable to load emails: " + error.message);
+      let bodyLoaded = false;
+      let bodyLoading = false;
 
-  } finally {
-    loading = false;
-    refreshButton.disabled = false;
-    loadMoreButton.disabled = false;
-  }
-}
+      card.addEventListener("click", async function() {
+        const isOpen = card.classList.toggle("open");
 
-function renderEmail(email) {
-  const card = document.createElement("div");
-  card.className = "email";
+        if (!isOpen || bodyLoaded || bodyLoading) return;
 
-  const subject = document.createElement("div");
-  subject.className = "subject";
+        bodyLoading = true;
+        body.textContent = "Loading message...";
 
-  if (email.unread) {
-    const dot = document.createElement("span");
-    dot.className = "unread";
-    subject.appendChild(dot);
-  }
+        try {
+          const data = await jsonp({
+            action: "body",
+            level: LEVEL,
+            id: email.id
+          });
 
-  subject.appendChild(
-    document.createTextNode(email.subject || "(No subject)")
-  );
+          if (!data || !data.success) {
+            throw new Error(
+              data && data.error
+                ? data.error
+                : "Could not load this message."
+            );
+          }
 
-  const sender = document.createElement("div");
-  sender.className = "sender";
-  sender.textContent = email.sender || "Unknown sender";
+          body.textContent = data.body || "(Empty message)";
+          bodyLoaded = true;
 
-  const date = document.createElement("div");
-  date.className = "date";
+        } catch (error) {
+          console.error("Email body error:", error);
 
-  const parsedDate = new Date(email.date);
+          body.textContent =
+            "Couldn't load this message. Please try again.";
 
-  date.textContent = isNaN(parsedDate.getTime())
-    ? ""
-    : parsedDate.toLocaleString();
-
-  const body = document.createElement("div");
-  body.className = "body";
-  body.textContent = "Tap to load message...";
-
-  card.append(subject, sender, date, body);
-
-  let bodyLoaded = false;
-  let bodyLoading = false;
-
-  card.addEventListener("click", async function() {
-    const isOpen = card.classList.toggle("open");
-
-    if (!isOpen || bodyLoaded || bodyLoading) return;
-
-    bodyLoading = true;
-    body.textContent = "Loading message...";
-
-    try {
-      const data = await jsonp({
-        action: "body",
-        level: LEVEL,
-        id: email.id
+        } finally {
+          bodyLoading = false;
+        }
       });
 
-      if (!data || !data.success) {
-        throw new Error(
-          data && data.error ? data.error : "Could not load message."
-        );
-      }
-
-      body.textContent = data.body || "(Empty message)";
-      bodyLoaded = true;
-
-    } catch (error) {
-      body.textContent = "Couldn't load this message. Tap Refresh and try again.";
-      console.error(error);
-
-    } finally {
-      bodyLoading = false;
+      emailContainer.appendChild(card);
     }
-  });
 
-  emailContainer.appendChild(card);
-}
+    // ==========================================
+    // START
+    // ==========================================
 
-document.getElementById("subtitle").textContent =
-  LEVEL === "owner" ? "Owner Mailbox · Full access" :
-  LEVEL === "level3" ? "Level 3 Mailbox · Read-only" :
-  LEVEL === "level2" ? "Level 2 Mailbox · Filtered Roblox notices" :
-  "Level 1 Mailbox · Regular emails";
-
-refreshEmails();
-</script>
-
+    refreshEmails();
+  </script>
 </body>
 </html>
