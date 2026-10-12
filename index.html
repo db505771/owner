@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fatty Family Mail</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0e0e0e;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:760px;margin:auto;padding:24px 16px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px}
+.brand{font-size:21px;font-weight:750;letter-spacing:-.6px}
+.badge{font-size:11px;background:#292929;padding:8px 12px;border-radius:20px}
+h1{font-size:31px;letter-spacing:-1px;margin:0 0 8px}
+.subtitle{color:#999;font-size:14px;line-height:1.6}
+.toolbar{display:flex;gap:10px;margin:24px 0}
+input{min-width:0;flex:1;padding:14px;border:1px solid #303030;border-radius:13px;background:#191919;color:white;font-size:14px;outline:none}
+button{border:0;border-radius:13px;padding:13px 16px;background:#fff;color:#111;font-weight:650;cursor:pointer}
+.section{font-size:11px;color:#888;letter-spacing:1.2px;text-transform:uppercase;margin:24px 0 12px}
+.email{display:block;width:100%;text-align:left;padding:16px;margin-bottom:10px;border:1px solid #292929;border-radius:15px;background:#171717;color:white}
+.email.unread{border-left:3px solid white}
+.top{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}
+.sender{font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.date{font-size:11px;color:#888;white-space:nowrap}
+.subject{font-size:14px;margin-bottom:7px;overflow-wrap:anywhere}
+.preview{font-size:13px;color:#999;line-height:1.5;overflow-wrap:anywhere}
+.status{padding:25px 8px;color:#999;font-size:13px;line-height:1.6}
+.hidden{display:none!important}
+footer{text-align:center;padding:28px 0;color:#666;font-size:11px}
+</style>
+</head>
+
+<body>
+<main class="app">
+<header>
+<div class="brand">Fatty Family Mail</div>
+<div class="badge">OWNER</div>
+</header>
+
+<h1>Your inbox.</h1>
+<div class="subtitle">Your mailbox, all in one place.</div>
+
+<div class="toolbar">
+<input id="search" type="search" placeholder="Search emails..." aria-label="Search emails">
+<button id="refresh">Refresh</button>
+</div>
+
+<div class="section">All emails</div>
+<div id="emails"></div>
+<div id="status" class="status">Connecting to your mailbox...</div>
+
+<footer>Fatty Family Mail · Owner Dashboard</footer>
+</main>
+
+<script>
+const LEVEL="owner";
+
+/*
+  Replace API_URL with your authenticated email API endpoint.
+  Do not put passwords or private access tokens in this public file.
+*/
+const API_URL="https://script.google.com/macros/s/AKfycbxZI7i0lDy1p5ph4V5DvWVY79KW-4kR6X3c081iMLIYVHyi7gnCtcP7jqVMelIvs4fpqQ/exec";
+
+const emailsElement=document.getElementById("emails");
+const statusElement=document.getElementById("status");
+
+document.getElementById("refresh").addEventListener("click",loadEmails);
+document.getElementById("search").addEventListener("input",filterEmails);
+
+function filterEmails(){
+  const query=document.getElementById("search").value.toLowerCase();
+  document.querySelectorAll(".email").forEach(el=>{
+    el.classList.toggle("hidden",!el.innerText.toLowerCase().includes(query));
+  });
+}
+
+function renderEmails(emails){
+  emailsElement.replaceChildren();
+
+  if(!emails.length){
+    statusElement.textContent="No emails found.";
+    return;
+  }
+
+  emails.forEach(mail=>{
+    const card=document.createElement("button");
+    card.className="email"+(mail.unread?" unread":"");
+
+    const top=document.createElement("div");
+    top.className="top";
+
+    const sender=document.createElement("div");
+    sender.className="sender";
+    sender.textContent=mail.sender||"Unknown sender";
+
+    const date=document.createElement("div");
+    date.className="date";
+    date.textContent=mail.date?new Date(mail.date).toLocaleDateString():"";
+
+    const subject=document.createElement("div");
+    subject.className="subject";
+    subject.textContent=mail.subject||"(No subject)";
+
+    const preview=document.createElement("div");
+    preview.className="preview";
+    preview.textContent=mail.body||"";
+
+    top.append(sender,date);
+    card.append(top,subject,preview);
+    emailsElement.append(card);
+  });
+
+  statusElement.textContent=emails.length+" emails loaded.";
+  filterEmails();
+}
+
+async function loadEmails(){
+  statusElement.textContent="Connecting...";
+  document.getElementById("refresh").disabled=true;
+
+  try{
+    /*
+      The current Apps Script code does not expose a JSON email API.
+      This request will work only after that endpoint is configured.
+    */
+    const response=await fetch(
+      API_URL+"?action=emails&level="+encodeURIComponent(LEVEL),
+      {method:"GET",credentials:"omit"}
+    );
+
+    if(!response.ok)throw new Error("Server returned "+response.status);
+
+    const data=await response.json();
+
+    if(!data.success)throw new Error(data.error||"Access denied.");
+
+    renderEmails(data.emails||[]);
+  }catch(error){
+    statusElement.textContent=
+      "Mailbox connection isn't configured yet. The Apps Script backend must provide an authenticated email API.";
+  }finally{
+    document.getElementById("refresh").disabled=false;
+  }
+}
+
+loadEmails();
+</script>
+</body>
+</html>
